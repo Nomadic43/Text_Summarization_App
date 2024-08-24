@@ -1,12 +1,23 @@
+from nt import truncate
+
 import streamlit as st
 from txtai.pipeline import Summary
 from PyPDF2 import PdfReader
 
 st.set_page_config(layout="wide")
 
+# @st.cache_resource
+# def load_summary_model():
+#     return Summary()
 
-@st.cache_resource
+# summary_model = load_summary_model()
+
+# @st.cache_data
 def summary_text(text):
+    # if isinstance(text,str):
+    #     text = text[:1000]
+    # else:
+    #     text = ""
     summary = Summary()
     result = summary(text)
     return result
@@ -28,10 +39,16 @@ if "summary_result" not in st.session_state:
 if "input_text" not in st.session_state:
     st.session_state.input_text = ""
 
+if "refresh" not in st.session_state:
+    st.session_state.refresh = False
+
+# if "extracted_text" not in st.session_state:
+#     st.session_state.extracted_text = ""
+
 choice = st.sidebar.selectbox("Select your choice", ["Summarize Text", "Summarize Document"])
 
 if choice == "Summarize Text":
-    st.subheader("SUMMARIZING YOUR TEXT USING TEXTAI")
+    st.subheader("QUICK BRIEF")
     st.write("This is a text summarization app")
 
     st.session_state.input_text = st.text_area("Enter your text here", value=st.session_state.input_text, key="text_input_area")
@@ -56,7 +73,7 @@ if choice == "Summarize Text":
                 key="download_summary_text"
             )
 
-elif choice == "Summarize Document":
+elif choice == "QUICK BREIF ON DOCUMENT":
     st.subheader("Summarize Document using txtai")
     input_file = st.file_uploader("Upload your document", type=["pdf"])
     if input_file:
@@ -72,7 +89,7 @@ elif choice == "Summarize Document":
         col1, col2 = st.columns([1, 1])
         with col1:
             st.markdown("**Extracted Text from Document**")
-            st.info(extracted_text)
+            st.info(extract_text_from_pdf("doc_file.pdf"))
         with col2:
             st.markdown("**Summarized Document**")
             st.text_area("Copy your summarized document", st.session_state.summary_result, height=200, key="summarized_document_area")
@@ -83,3 +100,8 @@ elif choice == "Summarize Document":
                 mime="text/plain",
                 key="download_summary_document"
             )
+
+if st.button("Refresh", key = "document_refresh_button"):
+    #Trigger refresh
+    st.session_state.refresh = True
+    st.rerun()
