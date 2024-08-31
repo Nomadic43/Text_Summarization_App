@@ -1,5 +1,3 @@
-from nt import truncate
-
 import streamlit as st
 from txtai.pipeline import Summary
 from PyPDF2 import PdfReader
